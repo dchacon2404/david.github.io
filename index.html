@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jorge David Chacón | Systems Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080c12;
+      --bg2: #0d1220;
+      --surface: #111827;
+      --surface2: #1a2235;
+      --border: #1e2d45;
+      --accent: #00d4ff;
+      --accent2: #7c3aed;
+      --accent3: #10b981;
+      --text: #e2e8f0;
+      --text-muted: #64748b;
+      --text-dim: #94a3b8;
+      --glow: rgba(0, 212, 255, 0.15);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Syne', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* Noise overlay */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 1; opacity: 0.4;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.2rem 4rem;
+      background: rgba(8,12,18,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Space Mono', monospace;
+      font-size: 1rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+    }
+    .nav-logo span { color: var(--text-muted); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute; bottom: -4px; left: 0; right: 0;
+      height: 1px; background: var(--accent);
+      transform: scaleX(0); transition: transform 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-links a:hover::after { transform: scaleX(1); }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 0 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+    }
+    .hero-glow {
+      position: absolute;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%);
+      top: 50%; left: 20%; transform: translate(-50%,-50%);
+      pointer-events: none;
+    }
+    .hero-glow2 {
+      position: absolute;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%);
+      top: 30%; right: 10%;
+      pointer-events: none;
+    }
+    .hero-content { position: relative; z-index: 2; max-width: 800px; }
+    .hero-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .hero-tag::before {
+      content: ''; width: 40px; height: 1px; background: var(--accent);
+    }
+    .hero-name {
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      font-weight: 800;
+      line-height: 0.95;
+      margin-bottom: 0.5rem;
+    }
+    .hero-name .highlight {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-role {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(0.9rem, 2vw, 1.15rem);
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+    .hero-desc {
+      font-size: 1.1rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+      max-width: 540px;
+      margin-bottom: 3rem;
+    }
+    .hero-buttons {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+    }
+    .btn-primary {
+      padding: 0.85rem 2rem;
+      background: var(--accent);
+      color: var(--bg);
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      border: none; cursor: pointer;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+      transition: all 0.2s;
+      text-decoration: none; display: inline-block;
+    }
+    .btn-primary:hover { background: #33ddff; transform: translateY(-2px); }
+    .btn-secondary {
+      padding: 0.85rem 2rem;
+      background: transparent;
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      border: 1px solid var(--border);
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+      transition: all 0.2s;
+      text-decoration: none; display: inline-block;
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+    .btn-outline {
+      padding: 0.85rem 2rem;
+      background: transparent;
+      color: var(--accent2);
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      border: 1px solid var(--accent2);
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+      transition: all 0.2s;
+      text-decoration: none; display: inline-block;
+    }
+    .btn-outline:hover { background: rgba(124,58,237,0.1); transform: translateY(-2px); }
+
+    .hero-stats {
+      position: absolute; right: 4rem; bottom: 4rem;
+      display: flex; flex-direction: column; gap: 1.5rem;
+    }
+    .stat {
+      text-align: right;
+      border-right: 2px solid var(--accent);
+      padding-right: 1rem;
+    }
+    .stat-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.8rem; font-weight: 700;
+      color: var(--accent); line-height: 1;
+    }
+    .stat-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem; color: var(--text-muted);
+      letter-spacing: 0.15em; text-transform: uppercase;
+    }
+
+    /* SECTIONS COMMON */
+    section { padding: 6rem 4rem; position: relative; z-index: 2; }
+    .section-header { margin-bottom: 3.5rem; }
+    .section-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem; color: var(--accent);
+      letter-spacing: 0.3em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 0.8rem;
+      margin-bottom: 0.8rem;
+    }
+    .section-tag::before { content: '//'; color: var(--text-muted); }
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800; line-height: 1.1;
+    }
+    .section-line {
+      width: 60px; height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      margin-top: 1rem;
+    }
+
+    /* ABOUT */
+    #about { background: var(--bg2); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: start;
+    }
+    .about-text p {
+      color: var(--text-dim); line-height: 1.8;
+      margin-bottom: 1.2rem; font-size: 1rem;
+    }
+    .about-text p strong { color: var(--text); font-weight: 600; }
+    .about-bullets { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
+    .about-bullets li {
+      display: flex; align-items: flex-start; gap: 0.8rem;
+      color: var(--text-dim); font-size: 0.95rem; line-height: 1.5;
+    }
+    .about-bullets li::before {
+      content: '▸'; color: var(--accent); flex-shrink: 0; margin-top: 0.1rem;
+    }
+    .about-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
+    }
+    .about-card-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem; color: var(--accent);
+      letter-spacing: 0.2em; text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+    .focus-areas { display: flex; flex-direction: column; gap: 0.8rem; }
+    .focus-item {
+      display: flex; align-items: center; gap: 0.8rem;
+      padding: 0.7rem 1rem;
+      background: var(--surface2);
+      border-left: 2px solid var(--accent2);
+      font-size: 0.9rem; color: var(--text-dim);
+      transition: all 0.2s;
+    }
+    .focus-item:hover { border-color: var(--accent); color: var(--text); background: var(--bg2); }
+    .focus-icon { font-size: 1rem; }
+
+    /* PROJECTS */
+    #projects { background: var(--bg); }
+    .project-category { margin-bottom: 4rem; }
+    .category-label {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+      padding: 0.4rem 1rem;
+      border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    .category-label.web { color: var(--accent); border-color: rgba(0,212,255,0.3); background: rgba(0,212,255,0.05); }
+    .category-label.cloud { color: #f59e0b; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.05); }
+    .category-label.auto { color: var(--accent3); border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.8rem;
+      position: relative; overflow: hidden;
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+      transition: all 0.3s;
+    }
+    .project-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .project-card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-4px); }
+    .project-card:hover::before { opacity: 1; }
+    .project-card.cloud-card::before { background: linear-gradient(90deg, #f59e0b, transparent); }
+    .project-card.auto-card::before { background: linear-gradient(90deg, var(--accent3), transparent); }
+    .project-card.cloud-card:hover { border-color: rgba(245,158,11,0.3); }
+    .project-card.auto-card:hover { border-color: rgba(16,185,129,0.3); }
+    .project-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem; color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .project-title {
+      font-size: 1.1rem; font-weight: 700;
+      margin-bottom: 0.8rem; color: var(--text);
+    }
+    .project-desc {
+      font-size: 0.88rem; color: var(--text-muted);
+      line-height: 1.6; margin-bottom: 1.2rem;
+    }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.5rem; }
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem; padding: 0.2rem 0.6rem;
+      border: 1px solid var(--border); color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+    .project-links { display: flex; gap: 1rem; }
+    .project-link {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem; color: var(--accent);
+      text-decoration: none; letter-spacing: 0.1em;
+      display: flex; align-items: center; gap: 0.3rem;
+      transition: opacity 0.2s;
+    }
+    .project-link:hover { opacity: 0.7; }
+    .project-link.cloud-link { color: #f59e0b; }
+    .project-link.auto-link { color: var(--accent3); }
+
+    /* CERTIFICATIONS */
+    #certifications { background: var(--bg2); }
+    .certs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.2rem;
+    }
+    .cert-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      display: flex; gap: 1.2rem; align-items: flex-start;
+      transition: all 0.25s;
+      position: relative; overflow: hidden;
+    }
+    .cert-card.in-progress { border-style: dashed; border-color: rgba(245,158,11,0.3); }
+    .cert-icon {
+      font-size: 1.8rem; flex-shrink: 0;
+      width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--surface2); border: 1px solid var(--border);
+    }
+    .cert-content { flex: 1; min-width: 0; }
+    .cert-name { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .cert-org {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem; color: var(--text-muted);
+      letter-spacing: 0.1em; margin-bottom: 0.5rem;
+    }
+    .cert-meta { display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; }
+    .cert-year {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem; color: var(--accent);
+    }
+    .cert-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem; padding: 0.15rem 0.5rem;
+      background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3);
+      color: var(--accent3); letter-spacing: 0.08em;
+    }
+    .cert-badge.progress {
+      background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3);
+      color: #f59e0b;
+    }
+    .cert-card:hover:not(.in-progress) { border-color: rgba(0,212,255,0.3); }
+
+    /* SKILLS */
+    #skills { background: var(--bg); }
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .skill-category-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.8rem;
+      clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+    }
+    .skill-cat-header {
+      display: flex; align-items: center; gap: 0.8rem;
+      margin-bottom: 1.2rem;
+    }
+    .skill-cat-icon { font-size: 1.2rem; }
+    .skill-cat-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+    }
+    .skill-cat-name.net { color: var(--accent); }
+    .skill-cat-name.cloud { color: #f59e0b; }
+    .skill-cat-name.web { color: var(--accent2); }
+    .skill-cat-name.data { color: var(--accent3); }
+    .skill-cat-name.sec { color: #ef4444; }
+    .skill-cat-name.auto { color: #a78bfa; }
+    .skill-items { display: flex; flex-direction: column; gap: 0.6rem; }
+    .skill-item {
+      display: flex; justify-content: space-between;
+      align-items: center; padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.88rem; color: var(--text-dim);
+    }
+    .skill-item:last-child { border-bottom: none; }
+    .skill-dots { display: flex; gap: 3px; }
+    .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--border);
+    }
+    .dot.filled { background: var(--accent); }
+    .dot.filled.cloud { background: #f59e0b; }
+    .dot.filled.purple { background: var(--accent2); }
+    .dot.filled.green { background: var(--accent3); }
+    .dot.filled.red { background: #ef4444; }
+    .dot.filled.violet { background: #a78bfa; }
+
+    /* CONTACT */
+    #contact {
+      background: var(--bg2);
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center;
+    }
+    .contact-header { margin-bottom: 3rem; }
+    .contact-subtitle {
+      color: var(--text-muted); font-size: 1rem; margin-top: 1rem;
+    }
+    .contact-links {
+      display: flex; gap: 1.5rem; flex-wrap: wrap;
+      justify-content: center; margin-bottom: 3rem;
+    }
+    .contact-link {
+      display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+      padding: 2rem 3rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      text-decoration: none;
+      clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+      transition: all 0.25s;
+      min-width: 180px;
+    }
+    .contact-link:hover { border-color: var(--accent); transform: translateY(-4px); }
+    .contact-link-icon { font-size: 2rem; }
+    .contact-link-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .contact-link-value { font-size: 0.9rem; color: var(--text); font-weight: 600; }
+    .contact-link:hover .contact-link-label { color: var(--accent); }
+
+    /* FOOTER */
+    footer {
+      padding: 2rem 4rem;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--bg);
+    }
+    .footer-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.1em;
+    }
+    .footer-accent { color: var(--accent); }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeLeft {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .reveal {
+      opacity: 1; transform: translateY(0);
+      transition: opacity 0.6s, transform 0.6s;
+    }
+    .reveal.hidden { opacity: 0; transform: translateY(24px); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      #hero { padding: 6rem 1.5rem 2rem; }
+      .hero-stats { display: none; }
+      section { padding: 4rem 1.5rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+      footer { flex-direction: column; gap: 1rem; text-align: center; }
+      .contact-link { min-width: 140px; padding: 1.5rem 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">JD<span>.</span>SYS <span>// engineer</span></div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#certifications">Certs</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-content">
+    <div class="hero-tag">Available for opportunities</div>
+    <h1 class="hero-name">
+      Jorge David<br>
+      <span class="highlight">Chacón</span><br>
+      Sibaja
+    </h1>
+    <p class="hero-role">Systems Engineer · Cloud & Networking Enthusiast</p>
+    <p class="hero-desc">
+      Systems Engineer experienced in web development and technical support, with a strong networking foundation.
+       Currently advancing my skills in Azure cloud infrastructure and automation technologies.
+    </p>
+    <div class="hero-buttons">
+      <a href="#projects" class="btn-primary">View Projects</a>
+      <a href="#contact" class="btn-secondary">Contact Me</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">3</div>
+      <div class="stat-label">Projects Built</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">6</div>
+      <div class="stat-label">Certifications</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">7</div>
+      <div class="stat-label">Tech Stacks</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-header reveal">
+    <div class="section-tag">who I am</div>
+    <h2 class="section-title">About Me</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="about-grid">
+    <div class="about-text reveal">
+      <p>
+        I'm <strong>Jorge David Chacón Sibaja</strong>, a <strong>Systems Engineer</strong> with a background in IT support and hands-on experience building web applications. I approach every project with a focus on clean, practical solutions that actually work.
+      </p>
+      <ul class="about-bullets">
+        <li>Graduate Systems Engineer with professional experience in <strong>IT support</strong> — hardware, software, OS installations and troubleshooting</li>
+        <li>Hands-on experience building web applications with HTML, CSS, JavaScript and Node.js</li>
+        <li>Certified in networking (Cisco CCNA), data analytics, and cybersecurity</li>
+        <li>Currently exploring <strong>cloud fundamentals</strong> — studying for Azure AZ-900</li>
+        <li>Interested in growing toward cloud infrastructure and automation</li>
+      </ul>
+    </div>
+    <div class="about-card reveal">
+      <div class="about-card-title">// Current Focus Areas</div>
+      <div class="focus-areas">
+        <div class="focus-item"><span class="focus-icon">🖥️</span>IT Support & Hardware Troubleshooting</div>
+        <div class="focus-item"><span class="focus-icon">💻</span>Web Development (HTML, CSS, JS, Node.js)</div>
+        <div class="focus-item"><span class="focus-icon">🌐</span>Network Architecture & Design</div>
+        <div class="focus-item"><span class="focus-icon">🔒</span>Cybersecurity Fundamentals</div>
+        <div class="focus-item"><span class="focus-icon">☁️</span>Cloud Basics (Azure — learning)</div>
+        <div class="focus-item"><span class="focus-icon">📊</span>Data Analysis & SQL</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-header reveal">
+    <div class="section-tag">what I've built</div>
+    <h2 class="section-title">Projects</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="project-category reveal">
+    <div class="category-label web">🌐 Web Development Projects</div>
+    <div class="projects-grid" style="grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));">
+      <div class="project-card" style="border-top: 2px solid var(--accent);">
+        <div class="project-num">01 / WEB</div>
+        <div class="project-title">Soda DND Teto — Restaurant Website</div>
+        <div class="project-desc">Full website developed for a local soda (restaurant). Includes menu display, contact info, and responsive design. Deployed on Azure with a Node.js backend.</div>
+        <div class="project-tags">
+          <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span><span class="tag">Node.js</span><span class="tag">Azure</span>
+        </div>
+      </div>
+      <div class="project-card" style="border-top: 2px solid rgba(0,212,255,0.4);">
+        <div class="project-num">02 / WEB</div>
+        <div class="project-title">Second-Hand Store <span style="font-size:0.75rem; color:var(--text-muted); font-weight:400;">· In Progress</span></div>
+        <div class="project-desc">E-commerce platform for a second-hand shop. Currently under development — product listings, cart, and checkout flow. Deployed via Render with Node.js backend.</div>
+        <div class="project-tags">
+          <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span><span class="tag">Node.js</span><span class="tag">Git</span><span class="tag">Render</span>
+        </div>
+        <div class="project-links">
+          <a href="https://avs-app.onrender.com/" class="project-link" target="_blank">↗ View Project</a>
+        </div>
+      </div>
+      <div class="project-card cloud-card" style="border-top: 2px solid rgba(245,158,11,0.7);">
+        <div class="project-num">03 / CLOUD · BACKEND</div>
+        <div class="project-title">Cloud Storage API — FastAPI, Docker & Azure</div>
+        <div class="project-desc">REST API for cloud file management using Azure Blob Storage. Supports file upload and listing with public URLs. Fully containerized with Docker for portability and easy deployment. Built autonomously, solving real challenges with containers, cloud config, and environment security.</div>
+        <div class="project-tags">
+          <span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Docker</span><span class="tag">Azure Blob Storage</span><span class="tag">REST API</span>
+        </div>
+        <div class="project-links">
+          <a href="https://lnkd.in/e-dypq-rh" class="project-link cloud-link" target="_blank">↗ GitHub Repo</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICATIONS -->
+<section id="certifications">
+  <div class="section-header reveal">
+    <div class="section-tag">credentials</div>
+    <h2 class="section-title">Certifications</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="certs-grid reveal">
+    <div class="cert-card">
+      <div class="cert-icon">📊</div>
+      <div class="cert-content">
+        <div class="cert-name">Data Analytics Essentials</div>
+        <div class="cert-org">CISCO NETWORKING ACADEMY</div>
+        <div class="cert-meta">
+          <span class="cert-year">2024</span>
+          <span class="cert-badge">Completed</span>
+        </div>
+      </div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">⚙️</div>
+      <div class="cert-content">
+        <div class="cert-name">AI Agents Automation Bootcamp</div>
+        <div class="cert-org">n8n.io · BOOTCAMP</div>
+        <div class="cert-meta">
+          <span class="cert-year">2025</span>
+          <span class="cert-badge">Completed</span>
+        </div>
+      </div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">🌐</div>
+      <div class="cert-content">
+        <div class="cert-name">Cisco CCNA</div>
+        <div class="cert-org">CISCO NETWORKING ACADEMY</div>
+        <div class="cert-meta">
+          <span class="cert-year">2024</span>
+          <span class="cert-badge">Completed</span>
+        </div>
+      </div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">🔒</div>
+      <div class="cert-content">
+        <div class="cert-name">Junior Cybersecurity Analyst</div>
+        <div class="cert-org">CISCO · CAREER PATH</div>
+        <div class="cert-meta">
+          <span class="cert-year">2024</span>
+          <span class="cert-badge">Completed</span>
+        </div>
+      </div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">🐍</div>
+      <div class="cert-content">
+        <div class="cert-name">Introduction to Python Programming</div>
+        <div class="cert-org">SANTANDER OPEN ACADEMY</div>
+        <div class="cert-meta">
+          <span class="cert-year">2026</span>
+          <span class="cert-badge">Completed</span>
+        </div>
+      </div>
+    </div>
+    <div class="cert-card in-progress">
+      <div class="cert-icon">☁️</div>
+      <div class="cert-content">
+        <div class="cert-name">Azure Fundamentals AZ-900</div>
+        <div class="cert-org">MICROSOFT</div>
+        <div class="cert-meta">
+          <span class="cert-year">2025</span>
+          <span class="cert-badge progress">In Progress</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-header reveal">
+    <div class="section-tag">technical stack</div>
+    <h2 class="section-title">Skills</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="skills-grid reveal">
+    <div class="skill-category-card">
+      <div class="skill-cat-header">
+        <span class="skill-cat-icon">🖥️</span>
+        <span class="skill-cat-name net">IT Support</span>
+      </div>
+      <div class="skill-items">
+        <div class="skill-item">Hardware Diagnosis<div class="skill-dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></div></div>
+        <div class="skill-item">OS Installation<div class="skill-dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></div></div>
+        <div class="skill-item">Software & Apps Setup<div class="skill-dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></div></div>
+        <div class="skill-item">Troubleshooting<div class="skill-dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></div></div>
+      </div>
+    </div>
+    <div class="skill-category-card">
+      <div class="skill-cat-header">
+        <span class="skill-cat-icon">☁️</span>
+        <span class="skill-cat-name cloud">Cloud · Azure</span>
+      </div>
+      <div class="skill-items">
+        <div class="skill-item">Azure Fundamentals<div class="skill-dots"><span class="dot filled cloud"></span><span class="dot filled cloud"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>
+        <div class="skill-item">App Services<div class="skill-dots"><span class="dot filled cloud"></span><span class="dot filled cloud"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>
+        <div class="skill-item">Static Web Apps<div class="skill-dots"><span class="dot filled cloud"></span><span class="dot filled cloud"></span><span class="dot filled cloud"></span><span class="dot"></span><span class="dot"></span></div></div>
+        <div class="skill-item">Storage Accounts<div class="skill-dots"><span class="dot filled cloud"></span><span class="dot filled cloud"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>
+      </div>
+    </div>
+    <div class="skill-category-card">
+      <div class="skill-cat-header">
+        <span class="skill-cat-icon">🌐</span>
+        <span class="skill-cat-name net">Networking</span>
+      </div>
+      <div class="skill-items">
+        <div class="skill-item">TCP/IP<div class="skill-dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></div></div>
+        <div class="skill-item">Routing & Switching<div class="skill-dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></div></div>
+        <div class="skill-item">VLANs & Subnetting<div class="skill-dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span></div></div>
+        <div class="skill-item">Network Security<div class="skill-dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span></div></div>
+      </div>
+    </div>
+    <div class="skill-category-card">
+      <div class="skill-cat-header">
+        <span class="skill-cat-icon">💻</span>
+        <span class="skill-cat-name web">Web Development</span>
+      </div>
+      <div class="skill-items">
+        <div class="skill-item">HTML / CSS<div class="skill-dots"><span class="dot filled purple"></span><span class="dot filled purple"></span><span class="dot filled purple"></span><span class="dot filled purple"></span><span class="dot"></span></div></div>
+        <div class="skill-item">JavaScript<div class="skill-dots"><span class="dot filled purple"></span><span class="dot filled purple"></span><span class="dot filled purple"></span><span class="dot"></span><span class="dot"></span></div></div>
+        <div class="skill-item">PHP / Node.js<div class="skill-dots"><span class="dot filled purple"></span><span class="dot filled purple"></span><span class="dot filled purple"></span><span class="dot"></span><span class="dot"></span></div></div>
+        <div class="skill-item">REST APIs<div class="skill-dots"><span class="dot filled purple"></span><span class="dot filled purple"></span><span class="dot filled purple"></span><span class="dot filled purple"></span><span class="dot"></span></div></div>
+      </div>
+    </div>
+    <div class="skill-category-card">
+      <div class="skill-cat-header">
+        <span class="skill-cat-icon">📊</span>
+        <span class="skill-cat-name data">Data</span>
+      </div>
+      <div class="skill-items">
+        <div class="skill-item">SQL<div class="skill-dots"><span class="dot filled green"></span><span class="dot filled green"></span><span class="dot filled green"></span><span class="dot filled green"></span><span class="dot"></span></div></div>
+        <div class="skill-item">Excel / Sheets<div class="skill-dots"><span class="dot filled green"></span><span class="dot filled green"></span><span class="dot filled green"></span><span class="dot filled green"></span><span class="dot"></span></div></div>
+        <div class="skill-item">Data Analysis<div class="skill-dots"><span class="dot filled green"></span><span class="dot filled green"></span><span class="dot filled green"></span><span class="dot"></span><span class="dot"></span></div></div>
+        <div class="skill-item">Data Visualization<div class="skill-dots"><span class="dot filled green"></span><span class="dot filled green"></span><span class="dot filled green"></span><span class="dot"></span><span class="dot"></span></div></div>
+      </div>
+    </div>
+    <div class="skill-category-card">
+      <div class="skill-cat-header">
+        <span class="skill-cat-icon">🔒</span>
+        <span class="skill-cat-name sec">Security</span>
+      </div>
+      <div class="skill-items">
+        <div class="skill-item">Security Principles<div class="skill-dots"><span class="dot filled red"></span><span class="dot filled red"></span><span class="dot filled red"></span><span class="dot"></span><span class="dot"></span></div></div>
+        <div class="skill-item">Firewall & NSG<div class="skill-dots"><span class="dot filled red"></span><span class="dot filled red"></span><span class="dot filled red"></span><span class="dot"></span><span class="dot"></span></div></div>
+        <div class="skill-item">IAM / Access Control<div class="skill-dots"><span class="dot filled red"></span><span class="dot filled red"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>
+        <div class="skill-item">Threat Awareness<div class="skill-dots"><span class="dot filled red"></span><span class="dot filled red"></span><span class="dot filled red"></span><span class="dot"></span><span class="dot"></span></div></div>
+      </div>
+    </div>
+    <div class="skill-category-card">
+      <div class="skill-cat-header">
+        <span class="skill-cat-icon">⚙️</span>
+        <span class="skill-cat-name auto">Automation</span>
+      </div>
+      <div class="skill-items">
+        <div class="skill-item">n8n Workflows<div class="skill-dots"><span class="dot filled violet"></span><span class="dot filled violet"></span><span class="dot filled violet"></span><span class="dot filled violet"></span><span class="dot"></span></div></div>
+        <div class="skill-item">API Integration<div class="skill-dots"><span class="dot filled violet"></span><span class="dot filled violet"></span><span class="dot filled violet"></span><span class="dot filled violet"></span><span class="dot"></span></div></div>
+        <div class="skill-item">Webhook Handling<div class="skill-dots"><span class="dot filled violet"></span><span class="dot filled violet"></span><span class="dot filled violet"></span><span class="dot"></span><span class="dot"></span></div></div>
+        <div class="skill-item">GitHub Actions<div class="skill-dots"><span class="dot filled violet"></span><span class="dot filled violet"></span><span class="dot filled violet"></span><span class="dot"></span><span class="dot"></span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-header reveal">
+    <div class="section-tag" style="justify-content:center">get in touch</div>
+    <h2 class="section-title">Contact</h2>
+    <div class="section-line" style="margin: 1rem auto 0"></div>
+    <p class="contact-subtitle">Open to cloud, infrastructure, and full-stack opportunities.</p>
+  </div>
+  <div class="contact-links reveal">
+    <a href="mailto:dchacon2404@gmail.com" class="contact-link">
+      <span class="contact-link-icon">✉️</span>
+      <span class="contact-link-label">Email</span>
+      <span class="contact-link-value">dchacon2404@gmail.com</span>
+    </a>
+    <a href="https://www.linkedin.com/in/jorge-david-chac%C3%B3n-sibaja-42a187200?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" target="_blank" class="contact-link">
+      <span class="contact-link-icon">💼</span>
+      <span class="contact-link-label">LinkedIn</span>
+      <span class="contact-link-value">in/david</span>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-text">© 2026 <span class="footer-accent">Jorge David Chacón</span> · Systems Engineer</div>
+</footer>
+
+<script>
+  const revealEls = document.querySelectorAll('.reveal');
+  revealEls.forEach(el => el.classList.add('hidden'));
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.remove('hidden');
+          entry.target.classList.add('visible');
+        }, i * 60);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.05 });
+  revealEls.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
